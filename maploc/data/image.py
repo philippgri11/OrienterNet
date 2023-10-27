@@ -81,14 +81,14 @@ def resize_image(
         scale = (w_new / w, h_new / h)
     if (w, h) != (w_new, h_new):
         mode = tvf.InterpolationMode.BILINEAR
-        image = tvf.resize(image, (h_new, w_new), interpolation=mode, antialias=True)
+        image = tvf.resize(image, (h_new.item(), w_new.item()), interpolation=mode, antialias=True)
         image.clip_(0, 1)
         if camera is not None:
             camera = camera.scale(scale)
         if valid is not None:
             valid = tvf.resize(
                 valid.unsqueeze(0),
-                (h_new, w_new),
+                (h_new.item(), w_new.item()),
                 interpolation=tvf.InterpolationMode.NEAREST,
             ).squeeze(0)
     ret = [image, scale]
