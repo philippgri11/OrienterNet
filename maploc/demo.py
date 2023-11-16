@@ -15,6 +15,7 @@ from .utils.wrappers import Camera
 from .utils.io import read_image
 from .utils.geo import BoundaryBox, Projection
 from .utils.exif import EXIF
+from time import time
 
 try:
     from geopy.geocoders import Nominatim
@@ -188,11 +189,18 @@ class Demo:
         )
 
     def localize(self, image: np.ndarray, camera: Camera, canvas: Canvas, **kwargs):
+        s = time()
         data = self.prepare_data(image, camera, canvas, **kwargs)
+        print(f"prepare data: {time()-s}s")
+
         data_ = {k: v.to(self.device)[None] for k, v in data.items()}
+        s = time()
         with torch.no_grad():
             pred = self.model(data_)
 
+        print(f"inference: {time()-s}s")
+
+        s = time()
         xy_gps = canvas.bbox.center
         uv_gps = torch.from_numpy(canvas.to_uv(xy_gps))
 
@@ -209,4 +217,5 @@ class Demo:
 
         prob = lp_xyr.exp().cpu()
         neural_map = pred["map"]["map_features"][0].squeeze(0).cpu()
+        print(f"postprocessing: {time() - s}s")
         return xyr[:2], xyr[2], prob, neural_map, data["image"]

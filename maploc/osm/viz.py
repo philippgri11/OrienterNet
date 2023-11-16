@@ -4,6 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
+import plotly.express as px
 import PIL.Image
 
 from ..utils.viz_2d import add_text
@@ -39,6 +40,22 @@ class GeoPlotter:
         center = latlons.reshape(-1, 2).mean(0)
         self.fig.update_layout(
             mapbox_center=dict(zip(("lat", "lon"), center)),
+        )
+
+    def points_df(self, df, color, text=None, name=None, size=5, **kwargs):
+        self.fig.add_trace(
+            go.Scattermapbox(
+                df,
+                lat='lat',
+                lon='lon',
+                mode="markers",
+                text=text,
+                marker_color=color,
+                marker_size=size,
+                name=name,
+                color_continuous_scale=px.colors.cyclical.IceFire,
+                **kwargs,
+            )
         )
 
     def bbox(self, bbox, color, name=None, **kwargs):
