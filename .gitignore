@@ -136,3 +136,9 @@ dmypy.json
 
 # vscode
 .vscode
+
+gespeicherte_bilder/
+
+saved_img/
+
+.idea/
